@@ -43,7 +43,6 @@
   }
   .note{ color:#aaa; font-size:12px; margin-top:6px; }
 
-  /* Print: only show the two worksheet images */
   @media print {
     body { background:#fff; }
     header, #controls, #previews { display:none !important; }
@@ -56,98 +55,96 @@
 </style>
 </head>
 <body>
-<header>
-  <h1>Pixel Math Worksheet Generator</h1>
-</header>
+  <header>
+    <h1>Pixel Math Worksheet Generator</h1>
+  </header>
 
-<section id="controls">
-  <div class="card">
-    <div id="drop">
-      <strong>Drop an image here</strong><br/>or click to choose
-      <input id="file" type="file" accept="image/*" style="display:none" />
-    </div>
-    <div class="note">Tip: square/compact images work best for larger grids.</div>
-  </div>
-
-  <div class="card">
-    <div class="row">
-      <div class="grow">
-        <div class="label">Number of pixels across</div>
-        <input id="cols" type="number" min="4" max="96" step="1" value="24" />
+  <section id="controls">
+    <div class="card">
+      <div id="drop">
+        <strong>Drop an image here</strong><br/>or click to choose
+        <input id="file" type="file" accept="image/*" style="display:none" />
       </div>
-      <div class="grow">
-        <div class="label">Number of pixels down</div>
-        <input id="rows" type="number" min="4" max="96" step="1" value="24" />
+      <div class="note">Tip: square/compact images work best for larger grids.</div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="grow">
+          <div class="label">Number of pixels across</div>
+          <input id="cols" type="number" min="4" max="96" step="1" value="24" />
+        </div>
+        <div class="grow">
+          <div class="label">Number of pixels down</div>
+          <input id="rows" type="number" min="4" max="96" step="1" value="24" />
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="grow">
-        <div class="label">Number of colors to use</div>
-        <input id="kcolors" type="number" min="2" max="12" step="1" value="6" />
+      <div class="row">
+        <div class="grow">
+          <div class="label">Number of colors to use</div>
+          <input id="kcolors" type="number" min="2" max="12" step="1" value="6" />
+        </div>
       </div>
-    </div>
-    
-    <div class="card" id="answersCard" style="display:none">
-      <div class="label">Answer Value for Each Color</div>
-      <div id="answersContainer"></div>
-    </div>
-    
-    <div class="row">
-      <div class="grow">
-        <div class="label">Font Size</div>
-        <input id="fontScale" type="number" min="0.5" max="2.0" step="0.1" value="18.0" />
+
+      <div class="card" id="answersCard" style="display:none">
+        <div class="label">Answer Value for Each Color</div>
+        <div id="answersContainer"></div>
       </div>
+
+      <div class="row">
+        <div class="grow">
+          <div class="label">Font Size</div>
+          <input id="fontScale" type="number" min="6" max="48" step="1" value="18" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnPixelate" class="grow">Pixelate</button>
+        <button id="btnGenerate" class="grow">Generate</button>
+      </div>
+
+      <div class="row" style="margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:6px;">
+          <input id="includeAnswerKey" type="checkbox" checked />
+          Include Answer Key in PDF
+        </label>
+      </div>
+
+      <div class="row">
+        <button id="btnSave" class="grow secondary">Save PDF</button>
+      </div>
+      <div class="note">“Save PDF” opens the print dialog; choose “Save as PDF”.</div>
     </div>
 
-    <div class="row">
-      <button id="btnPixelate" class="grow">Pixelate</button>
-      <button id="btnGenerate" class="grow">Generate</button>
+    <div class="card">
+      <div class="label">Original (fit)</div>
+      <canvas id="origCanvas" class="preview"></canvas>
     </div>
-    
-    <div class="row" style="margin-top:4px;">
-      <label style="display:flex;align-items:center;gap:6px;">
-        <input id="includeAnswerKey" type="checkbox" checked />
-        Include Answer Key in PDF
-      </label>
+
+    <div class="card">
+      <div class="label">Pixelated preview</div>
+      <canvas id="pixCanvas" class="preview"></canvas>
+      <div class="note">Click “Generate” to see worksheet and answer previews.</div>
     </div>
-    
-    <div class="row">
-      <button id="btnSave" class="grow secondary">Save PDF</button>
+
+    <div class="card">
+      <div class="label">Worksheet preview (used for PDF page 1)</div>
+      <img id="worksheetPreview" class="preview" alt="worksheet preview"/>
     </div>
-    <div class="note">“Save PDF” opens the print dialog; choose “Save as PDF”.</div>
-  </div>
 
-  <div class="card">
-    <div class="label">Original (fit)</div>
-    <canvas id="origCanvas" class="preview"></canvas>
-  </div>
+    <div class="card">
+      <div class="label">Answer key preview (used for PDF page 2)</div>
+      <img id="answerPreview" class="preview" alt="answer preview"/>
+    </div>
+  </section>
 
-  <div class="card">
-    <div class="label">Pixelated preview</div>
-    <canvas id="pixCanvas" class="preview"></canvas>
-    <div class="note">Click “Generate” to see worksheet and answer previews.</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Worksheet preview (used for PDF page 1)</div>
-    <img id="worksheetPreview" class="preview" alt="worksheet preview"/>
-  </div>
-
-  <div class="card">
-    <div class="label">Answer key preview (used for PDF page 2)</div>
-    <img id="answerPreview" class="preview" alt="answer preview"/>
-  </div>
-</section>
-
-<!-- Print-only images (2 pages) -->
-<section id="printWrap">
-  <img id="worksheetPrint" alt="worksheet print image"/>
-  <img id="answerPrint" class="page-break" alt="answer print image"/>
-</section>
+  <section id="printWrap">
+    <img id="worksheetPrint" alt="worksheet print image"/>
+    <img id="answerPrint" class="page-break" alt="answer print image"/>
+  </section>
 
 <script>
 (() => {
-  // ---- State
   let img = new Image();
   let imgLoaded = false;
 
@@ -167,165 +164,236 @@
   const answerPrintImg      = document.getElementById('answerPrint');
 
   let gridW=0, gridH=0;
-  let cellColors = []; // raw downsampled
-  let palette = [];    // [{r,g,b,hex}]
-  let indices = [];    // palette index per cell
-  let problems = [];   // problem text per cell
+  let cellColors = []; 
+  let palette = [];    
+  let indices = [];   
+  let problems = [];  
 
-  let lastPageW = 1800;
-  let lastPageH = 0;
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v|0));}
+  const rgbToHex = (r,g,b)=>'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
 
-  const clamp = (v,a,b) => Math.max(a, Math.min(b, v|0));
-  const rgbToHex = (r,g,b) => '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
-
-  // ---- Draw original
-  function drawOrigFit() {
-    if (!imgLoaded) { octx.clearRect(0,0,origCanvas.width,origCanvas.height); return; }
-    const maxW = 600;
-    const scale = Math.min(1, maxW / img.width);
-    origCanvas.width = Math.round(img.width * scale);
-    origCanvas.height = Math.round(img.height * scale);
-    octx.imageSmoothingEnabled = true;
+  function drawOrigFit(){
+    if(!imgLoaded){octx.clearRect(0,0,origCanvas.width,origCanvas.height);return;}
+    const maxW=600;
+    const scale=Math.min(1,maxW/img.width);
+    origCanvas.width=Math.round(img.width*scale);
+    origCanvas.height=Math.round(img.height*scale);
+    octx.imageSmoothingEnabled=true;
     octx.clearRect(0,0,origCanvas.width,origCanvas.height);
-    octx.drawImage(img, 0, 0, origCanvas.width, origCanvas.height);
+    octx.drawImage(img,0,0,origCanvas.width,origCanvas.height);
   }
 
-  // ---- Pixel sampling with averaging
-  function sampleToGrid(w, h) {
-    gridW = clamp(w, 4, 256);
-    gridH = clamp(h, 4, 256);
-
-    const tmp = document.createElement('canvas');
-    tmp.width = img.width;
-    tmp.height = img.height;
-    const tctx = tmp.getContext('2d', { willReadFrequently: true });
-    tctx.drawImage(img, 0, 0);
-
-    const data = tctx.getImageData(0, 0, img.width, img.height).data;
-    cellColors = new Array(gridW * gridH);
-
-    const stepX = img.width / gridW;
-    const stepY = img.height / gridH;
-
-    for (let y = 0; y < gridH; y++) {
-      for (let x = 0; x < gridW; x++) {
-        let rSum = 0, gSum = 0, bSum = 0, count = 0;
-
-        const startX = Math.floor(x * stepX);
-        const startY = Math.floor(y * stepY);
-        const endX = Math.min(Math.floor((x + 1) * stepX), img.width);
-        const endY = Math.min(Math.floor((y + 1) * stepY), img.height);
-
-        for (let iy = startY; iy < endY; iy++) {
-          for (let ix = startX; ix < endX; ix++) {
-            const idx = (iy * img.width + ix) * 4;
-            rSum += data[idx];
-            gSum += data[idx + 1];
-            bSum += data[idx + 2];
-            count++;
-          }
-        }
-
-        cellColors[y * gridW + x] = {
-          r: Math.round(rSum / count),
-          g: Math.round(gSum / count),
-          b: Math.round(bSum / count)
-        };
+  function sampleToGrid(w,h){
+    gridW=clamp(w,4,256);
+    gridH=clamp(h,4,256);
+    const tmp=document.createElement('canvas');
+    tmp.width=img.width; tmp.height=img.height;
+    const tctx=tmp.getContext('2d');
+    tctx.drawImage(img,0,0);
+    const data=tctx.getImageData(0,0,img.width,img.height).data;
+    cellColors=new Array(gridW*gridH);
+    const stepX=img.width/gridW;
+    const stepY=img.height/gridH;
+    for(let y=0;y<gridH;y++){
+      for(let x=0;x<gridW;x++){
+        const cx=Math.floor((x+0.5)*stepX);
+        const cy=Math.floor((y+0.5)*stepY);
+        const idx=(cy*img.width+cx)*4;
+        const r=data[idx],g=data[idx+1],b=data[idx+2];
+        cellColors[y*gridW+x]={r,g,b};
       }
     }
   }
 
-  // ---- K-means quantization
-  function kmeansQuantize(K, maxIter = 15) {
-    if (!cellColors.length) return;
-    const pixels = cellColors.map(p => [p.r, p.g, p.b]);
-
-    const centroids = [];
-    const usedIndices = new Set();
-    while (centroids.length < K) {
-      const idx = Math.floor(Math.random() * pixels.length);
-      if (!usedIndices.has(idx)) { centroids.push([...pixels[idx]]); usedIndices.add(idx); }
-    }
-
-    let assignments = new Array(pixels.length).fill(0);
-
-    for (let iter=0; iter<maxIter; iter++) {
-      for (let i=0;i<pixels.length;i++) {
-        let minD=Infinity, best=0;
-        for (let k=0;k<K;k++) {
-          const dr=pixels[i][0]-centroids[k][0];
-          const dg=pixels[i][1]-centroids[k][1];
-          const db=pixels[i][2]-centroids[k][2];
-          const d=dr*dr+dg*dg+db*db;
-          if (d<minD){minD=d;best=k;}
+  // K-means quantization for colors
+  function kmeansQuantize(k){
+    if(!cellColors.length)return;
+    // initialize palette with random pixels
+    palette=cellColors.slice(0,k).map(p=>({...p}));
+    let changed=true, iter=0;
+    const maxIter=20;
+    const assign=new Array(cellColors.length);
+    while(changed && iter<maxIter){
+      changed=false;
+      for(let i=0;i<cellColors.length;i++){
+        let best=0,bd=Infinity;
+        for(let j=0;j<k;j++){
+          const d=(cellColors[i].r-palette[j].r)**2+(cellColors[i].g-palette[j].g)**2+(cellColors[i].b-palette[j].b)**2;
+          if(d<bd){bd=d;best=j;}
         }
-        assignments[i]=best;
+        if(assign[i]!==best){assign[i]=best; changed=true;}
       }
-
-      const sums = Array(K).fill(0).map(()=>[0,0,0,0]);
-      for (let i=0;i<pixels.length;i++){
-        const k=assignments[i];
-        sums[k][0]+=pixels[i][0];
-        sums[k][1]+=pixels[i][1];
-        sums[k][2]+=pixels[i][2];
-        sums[k][3]+=1;
+      // recalc centroids
+      const sums=new Array(k).fill(0).map(()=>({r:0,g:0,b:0,count:0}));
+      for(let i=0;i<cellColors.length;i++){
+        const a=assign[i];
+        sums[a].r+=cellColors[i].r;
+        sums[a].g+=cellColors[i].g;
+        sums[a].b+=cellColors[i].b;
+        sums[a].count++;
       }
-      for (let k=0;k<K;k++){
-        if (sums[k][3]>0){
-          centroids[k][0]=sums[k][0]/sums[k][3];
-          centroids[k][1]=sums[k][1]/sums[k][3];
-          centroids[k][2]=sums[k][2]/sums[k][3];
+      for(let j=0;j<k;j++){
+        if(sums[j].count>0){
+          palette[j].r=Math.round(sums[j].r/sums[j].count);
+          palette[j].g=Math.round(sums[j].g/sums[j].count);
+          palette[j].b=Math.round(sums[j].b/sums[j].count);
         }
       }
+      iter++;
     }
+    palette=palette.map(p=>({...p,hex:rgbToHex(p.r,p.g,p.b)}));
+    indices=assign;
+  }
 
-    palette = centroids.map(c=>{
-      const r=Math.round(c[0]), g=Math.round(c[1]), b=Math.round(c[2]);
-      return {r,g,b,hex:rgbToHex(r,g,b), lum:0.2126*r+0.7152*g+0.0722*b};
-    }).sort((a,b)=>a.lum-b.lum);
-
-    indices = pixels.map(pix=>{
-      let best=0, minD=Infinity;
-      for (let k=0;k<palette.length;k++){
-        const dr=pix[0]-palette[k].r;
-        const dg=pix[1]-palette[k].g;
-        const db=pix[2]-palette[k].b;
-        const d=dr*dr+dg*dg+db*db;
-        if(d<minD){minD=d;best=k;}
+  function drawPixelatedPreview(){
+    if(!cellColors.length||!palette.length||!indices.length)return;
+    const scale=20;
+    pixCanvas.width=gridW;
+    pixCanvas.height=gridH;
+    pctx.clearRect(0,0,pixCanvas.width,pixCanvas.height);
+    for(let y=0;y<gridH;y++){
+      for(let x=0;x<gridW;x++){
+        const idx=y*gridW+x;
+        pctx.fillStyle=palette[indices[idx]].hex;
+        pctx.fillRect(x,y,1,1);
       }
-      return best;
+    }
+    pixCanvas.style.width=(gridW*scale)+'px';
+    pixCanvas.style.height=(gridH*scale)+'px';
+  }
+
+  function makeProblem(answerNum){
+    if(Math.random()<0.5){
+      let a=Math.floor(Math.random()*(answerNum+1));
+      let b=answerNum-a;
+      if(a===0&&answerNum>1&&Math.random()<0.6){a=1;b=answerNum-1;}
+      return `${a}+${b}`;
+    } else {
+      let span=10+Math.floor(Math.random()*6);
+      let a=answerNum+Math.floor(Math.random()*span);
+      if(a>30)a=30;
+      let b=a-answerNum;
+      return `${a}-${b}`;
+    }
+  }
+
+  function renderWorksheetCanvas(){
+    const PAGE_W=1800,MARGIN=60,TITLE_H=64;
+    const ND_H=40,ND_GAP=20,KEY_SWATCH=28,KEY_CELL_W=96,KEY_ROW_GAP=12;
+    const itemsPerRow=Math.max(1,Math.floor((PAGE_W-2*MARGIN)/KEY_CELL_W));
+    const keyRows=Math.ceil(palette.length/itemsPerRow);
+    const KEY_BLOCK_H=keyRows*(KEY_SWATCH+KEY_ROW_GAP)+6;
+    let cell=Math.max(16,Math.floor((PAGE_W-2*MARGIN)/gridW));
+    const gridDrawW=cell*gridW;
+    const gridDrawH=cell*gridH;
+    const PAGE_H=MARGIN+TITLE_H+ND_H+ND_GAP+KEY_BLOCK_H+20+gridDrawH+MARGIN;
+
+    const c=document.createElement('canvas');
+    c.width=PAGE_W;c.height=PAGE_H;
+    const ctx=c.getContext('2d');
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,PAGE_W,PAGE_H);
+    ctx.fillStyle='#000';ctx.textAlign='left';ctx.textBaseline='top';
+
+    ctx.font='bold 36px sans-serif';
+    ctx.fillText('Pixel Math Worksheet',MARGIN,MARGIN);
+    const ndY=MARGIN+TITLE_H;
+    ctx.font='18px sans-serif';
+    ctx.fillText('Name: ____________________',MARGIN,ndY);
+    ctx.fillText('Date: ____________________',MARGIN+500,ndY);
+
+    // color key
+    let x=MARGIN,y=ndY+ND_H+ND_GAP+8;
+    palette.forEach((col,i)=>{
+      if(x+KEY_CELL_W>PAGE_W-MARGIN){x=MARGIN;y+=KEY_SWATCH+KEY_ROW_GAP;}
+      ctx.fillStyle=col.hex;
+      ctx.fillRect(x,y-KEY_SWATCH/2,KEY_SWATCH,KEY_SWATCH);
+      ctx.strokeStyle='#000';ctx.lineWidth=1;
+      ctx.strokeRect(x,y-KEY_SWATCH/2,KEY_SWATCH,KEY_SWATCH);
+      ctx.fillStyle='#000';ctx.font='16px sans-serif';
+      ctx.fillText(`= ${i+1}`,x+KEY_SWATCH+8,y);
+      x+=KEY_CELL_W;
     });
+
+    // problems grid
+    const gridY=y+KEY_SWATCH/2+20;
+    const pad=Math.max(4,Math.floor(cell*0.1));
+    problems=new Array(gridW*gridH);
+    const fontSize=parseInt(document.getElementById('fontScale').value,10);
+
+    for(let r=0;r<gridH;r++){
+      for(let ccol=0;ccol<gridW;ccol++){
+        const idx=r*gridW+ccol;
+        const palIndex=indices[idx];
+        const ans=palIndex+1;
+        const prob=makeProblem(ans);
+        problems[idx]=prob;
+        const x0=MARGIN+ccol*cell;
+        const y0=gridY+r*cell;
+        ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.strokeRect(x0,y0,cell,cell);
+        ctx.fillStyle='#000';ctx.font=`${fontSize}px sans-serif`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(prob,x0+cell/2,y0+cell/2);
+      }
+    }
+    return c;
   }
 
-  // ---- File input / drop
-  const drop = document.getElementById('drop');
-  const file = document.getElementById('file');
-  drop.addEventListener('click', ()=> file.click());
-
-  function handleFiles(files) {
-    if (!files || !files[0]) return;
-    const url = URL.createObjectURL(files[0]);
-    const imgNew = new Image();
-    imgNew.onload = () => { img = imgNew; imgLoaded = true; drawOrigFit(); URL.revokeObjectURL(url); };
-    imgNew.onerror = () => alert('Could not load that image.');
-    imgNew.src = url;
+  function renderAnswerCanvas(){
+    const PAGE_W=1800,MARGIN=60;
+    const usableW=PAGE_W-2*MARGIN;
+    const cell=Math.max(6,Math.floor(usableW/gridW));
+    const c=document.createElement('canvas');
+    c.width=PAGE_W;c.height=cell*gridH+2*MARGIN;
+    const ctx=c.getContext('2d');
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+    for(let r=0;r<gridH;r++){
+      for(let col=0;col<gridW;col++){
+        const idx=r*gridW+col;
+        ctx.fillStyle=palette[indices[idx]].hex;
+        ctx.fillRect(MARGIN+col*cell,MARGIN+r*cell,cell,cell);
+      }
+    }
+    return c;
   }
-  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
-  drop.addEventListener('dragleave', ()=> drop.classList.remove('drag'));
-  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
-  file.addEventListener('change', e => handleFiles(e.target.files));
 
-  // ---- Buttons
-  document.getElementById('btnPixelate').addEventListener('click', ()=>{
+  // file input
+  const drop=document.getElementById('drop');
+  const file=document.getElementById('file');
+  drop.addEventListener('click',()=>file.click());
+  function handleFiles(files){
+    if(!files||!files[0])return;
+    const url=URL.createObjectURL(files[0]);
+    const imgNew=new Image();
+    imgNew.onload=()=>{img=imgNew;imgLoaded=true;drawOrigFit();URL.revokeObjectURL(url);};
+    imgNew.onerror=()=>alert('Could not load that image.');
+    imgNew.src=url;
+  }
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag');handleFiles(e.dataTransfer.files);});
+  file.addEventListener('change',()=>handleFiles(file.files));
+
+  // Pixelate
+  document.getElementById('btnPixelate').addEventListener('click',()=>{
     if(!imgLoaded){alert('Please upload an image first.');return;}
-    const W=parseInt(colsEl.value,10)||24;
-    const H=parseInt(rowsEl.value,10)||24;
-    const K=parseInt(kEl.value,10)||6;
-    sampleToGrid(W,H);
-    kmeansQuantize(K);
-    // drawPixelatedPreview(); -- add your drawPixelatedPreview function here
+    sampleToGrid(parseInt(colsEl.value,10),parseInt(rowsEl.value,10));
+    kmeansQuantize(parseInt(kEl.value,10));
+    drawPixelatedPreview();
   });
 
+  // Generate worksheet + answer key
+  document.getElementById('btnGenerate').addEventListener('click',()=>{
+    if(!cellColors.length||!palette.length||!indices.length){alert('Pixelate first.');return;}
+    const wsCanvas=renderWorksheetCanvas();
+    worksheetPreviewImg.src=wsCanvas.toDataURL();
+    worksheetPrintImg.src=wsCanvas.toDataURL();
+    const ansCanvas=renderAnswerCanvas();
+    answerPreviewImg.src=ansCanvas.toDataURL();
+    answerPrintImg.src=ansCanvas.toDataURL();
+  });
+
+  // Save PDF / print
+  document.getElementById('btnSave').addEventListener('click',()=>window.print());
 })();
 </script>
 </body>

@@ -43,6 +43,7 @@
   }
   .note{ color:#aaa; font-size:12px; margin-top:6px; }
 
+  /* Print: only show the two worksheet images */
   @media print {
     body { background:#fff; }
     header, #controls, #previews { display:none !important; }
@@ -94,7 +95,7 @@
       <div class="row">
         <div class="grow">
           <div class="label">Font Size</div>
-          <input id="fontScale" type="number" min="0.5" max="2.0" step="0.1" value="18.0" />
+          <input id="fontScale" type="number" min="6" max="36" step="1" value="18" />
         </div>
       </div>
 
@@ -102,14 +103,14 @@
         <button id="btnPixelate" class="grow">Pixelate</button>
         <button id="btnGenerate" class="grow">Generate</button>
       </div>
-      
+
       <div class="row" style="margin-top:4px;">
         <label style="display:flex;align-items:center;gap:6px;">
           <input id="includeAnswerKey" type="checkbox" checked />
           Include Answer Key in PDF
         </label>
       </div>
-      
+
       <div class="row">
         <button id="btnSave" class="grow secondary">Save PDF</button>
       </div>
@@ -150,104 +151,114 @@
 
   const colsEl = document.getElementById('cols');
   const rowsEl = document.getElementById('rows');
-  const kEl = document.getElementById('kcolors');
-  const includeAnswerKeyEl = document.getElementById('includeAnswerKey');
+  const kEl    = document.getElementById('kcolors');
 
   const origCanvas = document.getElementById('origCanvas');
-  const pixCanvas = document.getElementById('pixCanvas');
+  const pixCanvas  = document.getElementById('pixCanvas');
   const octx = origCanvas.getContext('2d');
   const pctx = pixCanvas.getContext('2d');
 
   const worksheetPreviewImg = document.getElementById('worksheetPreview');
-  const answerPreviewImg = document.getElementById('answerPreview');
-  const worksheetPrintImg = document.getElementById('worksheetPrint');
-  const answerPrintImg = document.getElementById('answerPrint');
+  const answerPreviewImg    = document.getElementById('answerPreview');
+  const worksheetPrintImg   = document.getElementById('worksheetPrint');
+  const answerPrintImg      = document.getElementById('answerPrint');
 
   let gridW=0, gridH=0;
   let cellColors = [];
   let palette = [];
   let indices = [];
   let problems = [];
-  let lastPageW=1800, lastPageH=0;
 
-  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v|0));
-  const rgbToHex = (r,g,b)=>'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
-  const dist2 = (a,b)=>{const dr=a.r-b.r,dg=a.g-b.g,db=a.b-b.b; return dr*dr+dg*dg+db*db;}
+  let lastPageW = 1800;
+  let lastPageH = 0;
+
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v|0));
+  const rgbToHex = (r,g,b) => '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+  const dist2 = (a,b)=>{ const dr=a.r-b.r, dg=a.g-b.g, db=a.b-b.b; return dr*dr+dg*dg+db*db; };
 
   function drawOrigFit(){
-    if(!imgLoaded){ octx.clearRect(0,0,origCanvas.width,origCanvas.height); return; }
-    const maxW=600;
-    const scale=Math.min(1,maxW/img.width);
-    origCanvas.width=Math.round(img.width*scale);
-    origCanvas.height=Math.round(img.height*scale);
-    octx.imageSmoothingEnabled=true;
+    if(!imgLoaded) { octx.clearRect(0,0,origCanvas.width,origCanvas.height); return; }
+    const maxW = 600;
+    const scale = Math.min(1,maxW/img.width);
+    origCanvas.width = Math.round(img.width*scale);
+    origCanvas.height = Math.round(img.height*scale);
+    octx.imageSmoothingEnabled = true;
     octx.clearRect(0,0,origCanvas.width,origCanvas.height);
     octx.drawImage(img,0,0,origCanvas.width,origCanvas.height);
   }
 
   function sampleToGrid(w,h){
-    gridW=clamp(w,4,256); gridH=clamp(h,4,256);
-    const tmp=document.createElement('canvas'); tmp.width=img.width; tmp.height=img.height;
-    const tctx=tmp.getContext('2d',{willReadFrequently:true});
+    gridW = clamp(w,4,256);
+    gridH = clamp(h,4,256);
+
+    const tmp = document.createElement('canvas');
+    tmp.width = img.width;
+    tmp.height = img.height;
+    const tctx = tmp.getContext('2d');
     tctx.drawImage(img,0,0);
-    const data=tctx.getImageData(0,0,img.width,img.height).data;
-    cellColors=new Array(gridW*gridH);
-    const stepX=img.width/gridW, stepY=img.height/gridH;
+
+    const data = tctx.getImageData(0,0,img.width,img.height).data;
+    cellColors = new Array(gridW*gridH);
+
+    const stepX = img.width/gridW;
+    const stepY = img.height/gridH;
+
     for(let y=0;y<gridH;y++){
       for(let x=0;x<gridW;x++){
-        const cx=Math.floor((x+0.5)*stepX);
-        const cy=Math.floor((y+0.5)*stepY);
-        const idx=(cy*img.width+cx)*4;
-        cellColors[y*gridW+x]={r:data[idx],g:data[idx+1],b:data[idx+2]};
+        const cx = Math.floor((x+0.5)*stepX);
+        const cy = Math.floor((y+0.5)*stepY);
+        const idx = (cy*img.width+cx)*4;
+        cellColors[y*gridW+x] = { r:data[idx], g:data[idx+1], b:data[idx+2] };
       }
     }
   }
 
-  function clusterQuantize(maxColors,tolerance=25){
-    const clusters=[];
+  function clusterQuantize(maxColors,tolerance=30){
+    const clusters = [];
     for(const pix of cellColors){
       let found=false;
       for(const cl of clusters){
-        const dr=pix.r-cl.r,dg=pix.g-cl.g,db=pix.b-cl.b;
-        const dist=Math.sqrt(dr*dr+dg*dg+db*db);
-        if(dist<tolerance){
+        const dr=pix.r-cl.r, dg=pix.g-cl.g, db=pix.b-cl.b;
+        if(Math.sqrt(dr*dr+dg*dg+db*db)<tolerance){
           cl.r=(cl.r*cl.count+pix.r)/(cl.count+1);
           cl.g=(cl.g*cl.count+pix.g)/(cl.count+1);
           cl.b=(cl.b*cl.count+pix.b)/(cl.count+1);
-          cl.count++; found=true; break;
+          cl.count++;
+          found=true;
+          break;
         }
       }
       if(!found) clusters.push({r:pix.r,g:pix.g,b:pix.b,count:1});
     }
 
-    function distance(a,b){ const dr=a.r-b.r,dg=a.g-b.g,db=a.b-b.b; return dr*dr+dg*dg+db*db; }
     while(clusters.length>maxColors){
       let minD=Infinity,ai=0,bi=1;
-      for(let i=0;i<clusters.length;i++){
+      for(let i=0;i<clusters.length;i++)
         for(let j=i+1;j<clusters.length;j++){
-          const d=distance(clusters[i],clusters[j]);
-          if(d<minD){ minD=d; ai=i; bi=j; }
+          const c1=clusters[i],c2=clusters[j];
+          const d=(c1.r-c2.r)**2+(c1.g-c2.g)**2+(c1.b-c2.b)**2;
+          if(d<minD){minD=d;ai=i;bi=j;}
         }
-      }
-      const a=clusters[ai], b=clusters[bi], total=a.count+b.count;
+      const a=clusters[ai],b=clusters[bi],total=a.count+b.count;
       a.r=(a.r*a.count+b.r*b.count)/total;
       a.g=(a.g*a.count+b.g*b.count)/total;
       a.b=(a.b*a.count+b.b*b.count)/total;
-      a.count=total; clusters.splice(bi,1);
+      a.count=total;
+      clusters.splice(bi,1);
     }
 
-    palette=clusters.map(c=>{
-      const hex=rgbToHex(Math.round(c.r),Math.round(c.g),Math.round(c.b));
-      const lum=0.2126*c.r+0.7152*c.g+0.0722*c.b;
+    palette = clusters.map(c=>{
+      const hex = rgbToHex(Math.round(c.r),Math.round(c.g),Math.round(c.b));
+      const lum = 0.2126*c.r+0.7152*c.g+0.0722*c.b;
       return {r:Math.round(c.r),g:Math.round(c.g),b:Math.round(c.b),hex,lum};
     }).sort((a,b)=>a.lum-b.lum);
 
-    indices=new Array(cellColors.length);
+    indices = new Array(cellColors.length);
     for(let i=0;i<cellColors.length;i++){
       let best=0,bd=Infinity;
       for(let c=0;c<palette.length;c++){
-        const d=distance(cellColors[i],palette[c]);
-        if(d<bd){ bd=d; best=c; }
+        const d=(cellColors[i].r-palette[c].r)**2+(cellColors[i].g-palette[c].g)**2+(cellColors[i].b-palette[c].b)**2;
+        if(d<bd){bd=d;best=c;}
       }
       indices[i]=best;
     }
@@ -255,33 +266,34 @@
 
   function drawPixelatedPreview(){
     const scale=10;
-    pixCanvas.width=gridW*scale; pixCanvas.height=gridH*scale;
+    pixCanvas.width=gridW*scale;
+    pixCanvas.height=gridH*scale;
     pctx.clearRect(0,0,pixCanvas.width,pixCanvas.height);
-    for(let y=0;y<gridH;y++){
+    for(let y=0;y<gridH;y++)
       for(let x=0;x<gridW;x++){
         const idx=indices[y*gridW+x];
         pctx.fillStyle=palette[idx].hex;
         pctx.fillRect(x*scale,y*scale,scale,scale);
       }
-    }
     pctx.strokeStyle='rgba(0,0,0,.35)';
-    for(let x=0;x<=gridW;x++){ pctx.beginPath(); pctx.moveTo(x*scale+.5,0); pctx.lineTo(x*scale+.5,gridH*scale); pctx.stroke(); }
-    for(let y=0;y<=gridH;y++){ pctx.beginPath(); pctx.moveTo(0,y*scale+.5); pctx.lineTo(gridW*scale,y*scale+.5); pctx.stroke(); }
+    for(let x=0;x<=gridW;x++){pctx.beginPath();pctx.moveTo(x*scale+.5,0);pctx.lineTo(x*scale+.5,gridH*scale);pctx.stroke();}
+    for(let y=0;y<=gridH;y++){pctx.beginPath();pctx.moveTo(0,y*scale+.5);pctx.lineTo(gridW*scale,y*scale+.5);pctx.stroke();}
   }
 
-  function makeProblem(answerNum){
-    if(Math.random()<0.5){ let a=Math.floor(Math.random()*(answerNum+1)), b=answerNum-a;
-      if(a===0&&answerNum>1&&Math.random()<0.6){ a=1;b=answerNum-1;} return `${a} + ${b}`;}
-    const span=10+Math.floor(Math.random()*6);
-    let a=answerNum+Math.floor(Math.random()*span); if(a>30)a=30;
-    let b=a-answerNum; return `${a} - ${b}`;
+  function makeProblem(ans){
+    if(Math.random()<0.5){ let a=Math.floor(Math.random()*(ans+1)); let b=ans-a; return `${a}+${b}`; }
+    const span=10+Math.floor(Math.random()*6); let a=ans+Math.floor(Math.random()*span); if(a>30)a=30; let b=a-ans; return `${a}-${b}`;
   }
 
   function renderWorksheetCanvas(){
-    const PAGE_W=1800,MARGIN=60,TITLE_H=64,ND_H=40,ND_GAP=20,KEY_SWATCH=28,KEY_CELL_W=96,KEY_ROW_GAP=12;
-    const c=document.createElement('canvas'); c.width=PAGE_W; c.height=2000;
+    const PAGE_W=1800,MARGIN=60,TITLE_H=64,ND_H=40,ND_GAP=20;
+    const KEY_SWATCH=28,KEY_CELL_W=96,KEY_ROW_GAP=12;
+    let cell = Math.floor((PAGE_W-2*MARGIN)/gridW);
+    const PAGE_H=MARGIN+TITLE_H+ND_H+ND_GAP+gridH*cell+MARGIN;
+
+    const c=document.createElement('canvas'); c.width=PAGE_W; c.height=PAGE_H;
     const ctx=c.getContext('2d');
-    ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,PAGE_W,PAGE_H);
     ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='top';
     ctx.font='bold 36px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
     ctx.fillText('Pixel Math Worksheet',MARGIN,MARGIN);
@@ -290,142 +302,120 @@
     ctx.fillText('Name: ____________________________',MARGIN,ndY);
     ctx.fillText('Date: ____________________________',MARGIN+500,ndY);
 
-    // Draw color key
-    let keyY=ndY+ND_H+ND_GAP;
-    ctx.font='bold 18px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    ctx.fillText('Color–Number Key:',MARGIN,keyY);
-    keyY+=8;
-    let x=MARGIN,y=keyY+36;
-    const answersCard=document.getElementById('answersCard');
-    const userAnswers=answersCard.style.display!=='none'?
-      Array.from(answersCard.querySelectorAll('input[type="number"]')).map(i=>parseFloat(i.value))
-      :palette.map((_,i)=>i+1);
-    palette.forEach((col,i)=>{
-      if(x+KEY_CELL_W>PAGE_W-MARGIN){ x=MARGIN; y+=KEY_SWATCH+KEY_ROW_GAP; }
-      ctx.fillStyle=col.hex; ctx.fillRect(x,y-KEY_SWATCH/2,KEY_SWATCH,KEY_SWATCH);
-      ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.strokeRect(x,y-KEY_SWATCH/2,KEY_SWATCH,KEY_SWATCH);
-      ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='middle';
-      ctx.fillText(`= ${userAnswers[i]}`,x+KEY_SWATCH+8,y);
-      x+=KEY_CELL_W;
-    });
+    const gridY=ndY+ND_H+ND_GAP;
 
-    // Draw pixel grid + problems
-    const gridY=y+KEY_SWATCH/2+20;
-    const cell=Math.max(16,Math.floor((PAGE_W-MARGIN*2)/gridW));
-    const pad=Math.max(6,Math.floor(cell*0.1));
-    problems=new Array(gridW*gridH);
+    // Draw original image lightly scaled behind grid
+    if(imgLoaded){
+      ctx.save(); ctx.globalAlpha=0.25;
+      ctx.drawImage(img,MARGIN,gridY,cell*gridW,cell*gridH);
+      ctx.restore();
+    }
+
+    const answersCard=document.getElementById('answersCard');
+    const userAnswers=answersCard.style.display!=='none'?Array.from(answersCard.querySelectorAll('input[type="number"]')).map(i=>parseFloat(i.value)):palette.map((_,i)=>i+1);
+
+    problems = new Array(gridW*gridH);
 
     for(let r=0;r<gridH;r++){
       for(let ccol=0;ccol<gridW;ccol++){
         const idx=r*gridW+ccol;
         const palIndex=indices[idx];
         const ans=userAnswers[palIndex];
-        const prob=makeProblem(ans);
-        problems[idx]=prob;
+        problems[idx]=makeProblem(ans);
 
-        const px=MARGIN+ccol*cell, py=gridY+r*cell;
-        ctx.fillStyle=palette[palIndex].hex; ctx.fillRect(px,py,cell,cell);
-        ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1; ctx.strokeRect(px,py,cell,cell);
+        const x0=MARGIN+ccol*cell;
+        const y0=gridY+r*cell;
+        ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1; ctx.strokeRect(x0,y0,cell,cell);
 
-        ctx.font=`${Math.floor(cell*0.5)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-        ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText(prob,px+cell/2,py+cell/2);
+        const fontPx=parseInt(document.getElementById('fontScale').value)||18;
+        ctx.font=`${fontPx}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
+        ctx.fillStyle='#000';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(problems[idx],x0+cell/2,y0+cell/2);
       }
     }
 
-    lastPageW=PAGE_W; lastPageH=gridY+gridH*cell+MARGIN;
-    c.height=lastPageH;
+    lastPageW=PAGE_W; lastPageH=PAGE_H;
     return c;
   }
 
   function renderAnswerCanvas(){
-    const PAGE_W=lastPageW, PAGE_H=lastPageH;
+    const PAGE_W=lastPageW||1800;
+    const PAGE_H=lastPageH||1300;
+    const MARGIN=60;
+    const usableW=PAGE_W-2*MARGIN;
+    const usableH=PAGE_H-2*MARGIN;
+    const cell=Math.max(6,Math.min(Math.floor(usableW/gridW),Math.floor(usableH/gridH)));
+
+    const gridDrawW=cell*gridW;
+    const gridDrawH=cell*gridH;
+    const xStart=Math.floor((PAGE_W-gridDrawW)/2);
+    const yStart=Math.floor((PAGE_H-gridDrawH)/2);
+
     const c=document.createElement('canvas'); c.width=PAGE_W; c.height=PAGE_H;
     const ctx=c.getContext('2d');
-    ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,PAGE_W,PAGE_H);
 
-    ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='top';
-    ctx.font='bold 36px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    ctx.fillText('Answer Key',60,60);
-
-    const ndY=60+64;
-    ctx.font='18px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    ctx.fillText('Name: ____________________________',60,ndY);
-    ctx.fillText('Date: ____________________________',60+500,ndY);
-
-    const answersCard=document.getElementById('answersCard');
-    const userAnswers=answersCard.style.display!=='none'?
-      Array.from(answersCard.querySelectorAll('input[type="number"]')).map(i=>parseFloat(i.value))
-      :palette.map((_,i)=>i+1);
-
-    // Draw grid with numbers
-    const gridY=ndY+40+20;
-    const cell=Math.max(16,Math.floor((PAGE_W-120)/gridW));
-    for(let r=0;r<gridH;r++){
-      for(let ccol=0;ccol<gridW;ccol++){
-        const idx=r*gridW+ccol;
-        const palIndex=indices[idx];
-        const ans=userAnswers[palIndex];
-
-        const px=60+ccol*cell, py=gridY+r*cell;
-        ctx.fillStyle='#fff'; ctx.fillRect(px,py,cell,cell);
-        ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1; ctx.strokeRect(px,py,cell,cell);
-
-        ctx.font=`${Math.floor(cell*0.5)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-        ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText(ans,px+cell/2,py+cell/2);
+    for(let r=0;r<gridH;r++)
+      for(let col=0;col<gridW;col++){
+        const idx=r*gridW+col;
+        ctx.fillStyle=palette[indices[idx]].hex;
+        ctx.fillRect(xStart+col*cell,yStart+r*cell,cell,cell);
       }
-    }
+
+    ctx.strokeStyle='rgba(0,0,0,0.35)';
+    for(let x=0;x<=gridW;x++){ctx.beginPath();ctx.moveTo(xStart+x*cell,yStart);ctx.lineTo(xStart+x*cell,yStart+gridDrawH);ctx.stroke();}
+    for(let y=0;y<=gridH;y++){ctx.beginPath();ctx.moveTo(xStart,yStart+y*cell);ctx.lineTo(xStart+gridDrawW,yStart+y*cell);ctx.stroke();}
     return c;
   }
 
-  function updateAnswerInputs(){
-    const k=parseInt(kEl.value)||6;
-    const container=document.getElementById('answersContainer');
-    container.innerHTML='';
-    for(let i=0;i<k;i++){
-      const inp=document.createElement('input');
-      inp.type='number'; inp.value=i+1; inp.style.width='50px'; inp.style.marginRight='6px';
-      container.appendChild(inp);
-    }
-    document.getElementById('answersCard').style.display='block';
+  // File drop
+  const drop = document.getElementById('drop');
+  const fileInput = document.getElementById('file');
+
+  drop.addEventListener('click',()=>fileInput.click());
+  fileInput.addEventListener('change',e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); });
+
+  drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave',e=>{ drop.classList.remove('drag'); });
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('drag'); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+  function loadFile(f){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      img.onload=()=>{ imgLoaded=true; drawOrigFit(); };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(f);
   }
 
   document.getElementById('btnPixelate').addEventListener('click',()=>{
-    if(!imgLoaded) return alert('Load an image first.');
+    if(!imgLoaded) return alert('Load an image first!');
     sampleToGrid(parseInt(colsEl.value),parseInt(rowsEl.value));
     clusterQuantize(parseInt(kEl.value));
     drawPixelatedPreview();
-    updateAnswerInputs();
+    // Show answer inputs
+    const answersCard=document.getElementById('answersCard');
+    answersCard.innerHTML='';
+    palette.forEach((p,i)=>{
+      const div=document.createElement('div');
+      div.style.display='flex'; div.style.alignItems='center'; div.style.marginBottom='4px';
+      const label=document.createElement('span'); label.textContent=p.hex; label.style.width='60px';
+      const inp=document.createElement('input'); inp.type='number'; inp.value=i+1; inp.style.flex='1';
+      div.appendChild(label); div.appendChild(inp);
+      answersCard.appendChild(div);
+    });
+    answersCard.style.display='block';
   });
 
   document.getElementById('btnGenerate').addEventListener('click',()=>{
-    const ws=renderWorksheetCanvas();
-    const ans=renderAnswerCanvas();
-    worksheetPreviewImg.src=ws.toDataURL('image/png');
-    answerPreviewImg.src=ans.toDataURL('image/png');
-    worksheetPrintImg.src=ws.toDataURL('image/png');
-    answerPrintImg.src=ans.toDataURL('image/png');
+    const wsC=renderWorksheetCanvas();
+    const ansC=renderAnswerCanvas();
+    worksheetPreviewImg.src=wsC.toDataURL();
+    answerPreviewImg.src=ansC.toDataURL();
+    worksheetPrintImg.src=wsC.toDataURL();
+    answerPrintImg.src=ansC.toDataURL();
   });
-
-  const drop=document.getElementById('drop');
-  drop.addEventListener('click',()=>document.getElementById('file').click());
-  drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('drag'); });
-  drop.addEventListener('dragleave',e=>{ e.preventDefault(); drop.classList.remove('drag'); });
-  drop.addEventListener('drop',e=>{
-    e.preventDefault(); drop.classList.remove('drag');
-    const f=e.dataTransfer.files[0]; if(f) loadImage(f);
-  });
-  document.getElementById('file').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) loadImage(f); });
-
-  function loadImage(file){
-    const reader=new FileReader();
-    reader.onload=e=>{
-      img.src=e.target.result;
-      img.onload=()=>{ imgLoaded=true; drawOrigFit(); };
-    }
-    reader.readAsDataURL(file);
-  }
 
   document.getElementById('btnSave').addEventListener('click',()=>window.print());
 })();

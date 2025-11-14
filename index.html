@@ -56,98 +56,94 @@
 </style>
 </head>
 <body>
-  <header>
-    <h1>Pixel Math Worksheet Generator</h1>
-  </header>
+<header>
+  <h1>Pixel Math Worksheet Generator</h1>
+</header>
 
-  <section id="controls">
-    <div class="card">
-      <div id="drop">
-        <strong>Drop an image here</strong><br/>or click to choose
-        <input id="file" type="file" accept="image/*" style="display:none" />
-      </div>
-      <div class="note">Tip: square/compact images work best for larger grids.</div>
+<section id="controls">
+  <div class="card">
+    <div id="drop">
+      <strong>Drop an image here</strong><br/>or click to choose
+      <input id="file" type="file" accept="image/*" style="display:none" />
     </div>
+    <div class="note">Tip: square/compact images work best for larger grids.</div>
+  </div>
 
-    <div class="card">
-      <div class="row">
-        <div class="grow">
-          <div class="label">Number of pixels across</div>
-          <input id="cols" type="number" min="4" max="96" step="1" value="24" />
-        </div>
-        <div class="grow">
-          <div class="label">Number of pixels down</div>
-          <input id="rows" type="number" min="4" max="96" step="1" value="24" />
-        </div>
+  <div class="card">
+    <div class="row">
+      <div class="grow">
+        <div class="label">Number of pixels across</div>
+        <input id="cols" type="number" min="4" max="96" step="1" value="24" />
       </div>
-      <div class="row">
-        <div class="grow">
-          <div class="label">Number of colors to use</div>
-          <input id="kcolors" type="number" min="2" max="12" step="1" value="6" />
-        </div>
+      <div class="grow">
+        <div class="label">Number of pixels down</div>
+        <input id="rows" type="number" min="4" max="96" step="1" value="24" />
       </div>
-      
-      <div class="card" id="answersCard" style="display:none">
-        <div class="label">Answer Value for Each Color</div>
-        <div id="answersContainer"></div>
+    </div>
+    <div class="row">
+      <div class="grow">
+        <div class="label">Number of colors to use</div>
+        <input id="kcolors" type="number" min="2" max="12" step="1" value="6" />
       </div>
-      
-      <div class="row">
-        <div class="grow">
-          <div class="label">Font Size</div>
-          <input id="fontScale" type="number" min="0.5" max="2.0" step="0.1" value="18.0" />
-        </div>
-      </div>
-
-      
-      <div class="row">
-        <button id="btnPixelate" class="grow">Pixelate</button>
-        <button id="btnGenerate" class="grow">Generate</button>
-      </div>
-      
-      <div class="row" style="margin-top:4px;">
-        <label style="display:flex;align-items:center;gap:6px;">
-          <input id="includeAnswerKey" type="checkbox" checked />
-          Include Answer Key in PDF
-        </label>
-      </div>
-      
-      <div class="row">
-        <button id="btnSave" class="grow secondary">Save PDF</button>
-      </div>
-      <div class="note">“Save PDF” opens the print dialog; choose “Save as PDF”.</div>
     </div>
     
+    <div class="card" id="answersCard" style="display:none">
+      <div class="label">Answer Value for Each Color</div>
+      <div id="answersContainer"></div>
+    </div>
     
-
-
-    <div class="card">
-      <div class="label">Original (fit)</div>
-      <canvas id="origCanvas" class="preview"></canvas>
+    <div class="row">
+      <div class="grow">
+        <div class="label">Font Size</div>
+        <input id="fontScale" type="number" min="0.5" max="2.0" step="0.1" value="18.0" />
+      </div>
     </div>
 
-    <div class="card">
-      <div class="label">Pixelated preview</div>
-      <canvas id="pixCanvas" class="preview"></canvas>
-      <div class="note">Click “Generate” to see worksheet and answer previews.</div>
+    <div class="row">
+      <button id="btnPixelate" class="grow">Pixelate</button>
+      <button id="btnGenerate" class="grow">Generate</button>
     </div>
-
-    <div class="card">
-      <div class="label">Worksheet preview (used for PDF page 1)</div>
-      <img id="worksheetPreview" class="preview" alt="worksheet preview"/>
+    
+    <div class="row" style="margin-top:4px;">
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input id="includeAnswerKey" type="checkbox" checked />
+        Include Answer Key in PDF
+      </label>
     </div>
-
-    <div class="card">
-      <div class="label">Answer key preview (used for PDF page 2)</div>
-      <img id="answerPreview" class="preview" alt="answer preview"/>
+    
+    <div class="row">
+      <button id="btnSave" class="grow secondary">Save PDF</button>
     </div>
-  </section>
+    <div class="note">“Save PDF” opens the print dialog; choose “Save as PDF”.</div>
+  </div>
 
-  <!-- Print-only images (2 pages) -->
-  <section id="printWrap">
-    <img id="worksheetPrint" alt="worksheet print image"/>
-    <img id="answerPrint" class="page-break" alt="answer print image"/>
-  </section>
+  <div class="card">
+    <div class="label">Original (fit)</div>
+    <canvas id="origCanvas" class="preview"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="label">Pixelated preview</div>
+    <canvas id="pixCanvas" class="preview"></canvas>
+    <div class="note">Click “Generate” to see worksheet and answer previews.</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Worksheet preview (used for PDF page 1)</div>
+    <img id="worksheetPreview" class="preview" alt="worksheet preview"/>
+  </div>
+
+  <div class="card">
+    <div class="label">Answer key preview (used for PDF page 2)</div>
+    <img id="answerPreview" class="preview" alt="answer preview"/>
+  </div>
+</section>
+
+<!-- Print-only images (2 pages) -->
+<section id="printWrap">
+  <img id="worksheetPrint" alt="worksheet print image"/>
+  <img id="answerPrint" class="page-break" alt="answer print image"/>
+</section>
 
 <script>
 (() => {
@@ -176,15 +172,13 @@
   let indices = [];    // palette index per cell
   let problems = [];   // problem text per cell
 
-  // Keep page dimensions consistent between pages
   let lastPageW = 1800;
-  let lastPageH = 0; // set after worksheet render
+  let lastPageH = 0;
 
-  // ---- Helpers
   const clamp = (v,a,b) => Math.max(a, Math.min(b, v|0));
   const rgbToHex = (r,g,b) => '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
-  const dist2 = (a,b)=>{ const dr=a.r-b.r, dg=a.g-b.g, db=a.b-b.b; return dr*dr+dg*dg+db*db; };
 
+  // ---- Draw original
   function drawOrigFit() {
     if (!imgLoaded) { octx.clearRect(0,0,origCanvas.width,origCanvas.height); return; }
     const maxW = 600;
@@ -196,21 +190,7 @@
     octx.drawImage(img, 0, 0, origCanvas.width, origCanvas.height);
   }
 
-  // function sampleToGrid(w,h) {
-  //   gridW = clamp(w, 4, 256);
-  //   gridH = clamp(h, 4, 256);
-  //   const tmp = document.createElement('canvas');
-  //   tmp.width = gridW; tmp.height = gridH;
-  //   const tctx = tmp.getContext('2d', { willReadFrequently: true });
-  //   tctx.imageSmoothingEnabled = true;
-  //   tctx.drawImage(img, 0, 0, gridW, gridH);
-  //   const data = tctx.getImageData(0,0,gridW,gridH).data;
-  //   cellColors = new Array(gridW*gridH);
-  //   for (let i=0;i<gridW*gridH;i++){
-  //     cellColors[i] = { r:data[i*4], g:data[i*4+1], b:data[i*4+2] };
-  //   }
-  // }
-  
+  // ---- Pixel sampling with averaging
   function sampleToGrid(w, h) {
     gridW = clamp(w, 4, 256);
     gridH = clamp(h, 4, 256);
@@ -224,356 +204,97 @@
     const data = tctx.getImageData(0, 0, img.width, img.height).data;
     cellColors = new Array(gridW * gridH);
 
-    // Compute step size in source image
     const stepX = img.width / gridW;
     const stepY = img.height / gridH;
 
     for (let y = 0; y < gridH; y++) {
       for (let x = 0; x < gridW; x++) {
-        const cx = Math.floor((x + 0.5) * stepX);
-        const cy = Math.floor((y + 0.5) * stepY);
-        const idx = (cy * img.width + cx) * 4;
-        const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-        cellColors[y * gridW + x] = { r, g, b };
-      }
-    }
-  }
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
 
-  function clusterQuantize(maxColors, tolerance = 25) {
-    // maxColors = desired number of colors in the final palette
-    // tolerance  = how far apart colors must be in RGB space to start a new cluster
+        const startX = Math.floor(x * stepX);
+        const startY = Math.floor(y * stepY);
+        const endX = Math.min(Math.floor((x + 1) * stepX), img.width);
+        const endY = Math.min(Math.floor((y + 1) * stepY), img.height);
 
-    const clusters = [];
-
-    // iterate through all sampled pixels
-    for (const pix of cellColors) {
-      // try to find an existing cluster within tolerance distance
-      let found = false;
-      for (const cl of clusters) {
-        const dr = pix.r - cl.r;
-        const dg = pix.g - cl.g;
-        const db = pix.b - cl.b;
-        const dist = Math.sqrt(dr * dr + dg * dg + db * db);
-        if (dist < tolerance) {
-          // merge pixel into cluster
-          cl.r = (cl.r * cl.count + pix.r) / (cl.count + 1);
-          cl.g = (cl.g * cl.count + pix.g) / (cl.count + 1);
-          cl.b = (cl.b * cl.count + pix.b) / (cl.count + 1);
-          cl.count++;
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        clusters.push({ r: pix.r, g: pix.g, b: pix.b, count: 1 });
-      }
-    }
-
-    // if too many clusters, merge closest until we reach maxColors
-    function distance(a, b) {
-      const dr = a.r - b.r, dg = a.g - b.g, db = a.b - b.b;
-      return dr * dr + dg * dg + db * db;
-    }
-
-    while (clusters.length > maxColors) {
-      // find the two closest clusters
-      let minD = Infinity, ai = 0, bi = 1;
-      for (let i = 0; i < clusters.length; i++) {
-        for (let j = i + 1; j < clusters.length; j++) {
-          const d = distance(clusters[i], clusters[j]);
-          if (d < minD) { minD = d; ai = i; bi = j; }
-        }
-      }
-      // merge b into a
-      const a = clusters[ai], b = clusters[bi];
-      const total = a.count + b.count;
-      a.r = (a.r * a.count + b.r * b.count) / total;
-      a.g = (a.g * a.count + b.g * b.count) / total;
-      a.b = (a.b * a.count + b.b * b.count) / total;
-      a.count = total;
-      clusters.splice(bi, 1);
-    }
-
-    // Build palette sorted by luminance
-    const pal = clusters.map(c => {
-      const hex = rgbToHex(Math.round(c.r), Math.round(c.g), Math.round(c.b));
-      const lum = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
-      return { r: Math.round(c.r), g: Math.round(c.g), b: Math.round(c.b), hex, lum };
-    }).sort((a, b) => a.lum - b.lum);
-
-    // Map each pixel to its nearest palette color
-    indices = new Array(cellColors.length);
-    for (let i = 0; i < cellColors.length; i++) {
-      const p = cellColors[i];
-      let best = 0, bd = Infinity;
-      for (let c = 0; c < pal.length; c++) {
-        const d = distance(p, pal[c]);
-        if (d < bd) { bd = d; best = c; }
-      }
-      indices[i] = best;
-    }
-
-    palette = pal;
-  }
-
- 
-
-  function drawPixelatedPreview() {
-    const scale = 10;
-    pixCanvas.width = gridW*scale;
-    pixCanvas.height = gridH*scale;
-    pctx.clearRect(0,0,pixCanvas.width,pixCanvas.height);
-    for (let y=0;y<gridH;y++){
-      for (let x=0;x<gridW;x++){
-        const idx = indices[y*gridW+x];
-        pctx.fillStyle = palette[idx].hex;
-        pctx.fillRect(x*scale, y*scale, scale, scale);
-      }
-    }
-    pctx.strokeStyle = 'rgba(0,0,0,.35)';
-    for (let x=0;x<=gridW;x++){ pctx.beginPath(); pctx.moveTo(x*scale+.5, 0); pctx.lineTo(x*scale+.5, gridH*scale); pctx.stroke(); }
-    for (let y=0;y<=gridH;y++){ pctx.beginPath(); pctx.moveTo(0, y*scale+.5); pctx.lineTo(gridW*scale, y*scale+.5); pctx.stroke(); }
-  }
-
-  function makeProblem(answerNum /*1..K*/) {
-    if (Math.random()<0.5) { // a + b = n
-      let a = Math.floor(Math.random()*(answerNum+1));
-      let b = answerNum - a;
-      if (a===0 && answerNum>1 && Math.random()<0.6) { a=1; b=answerNum-1; }
-      return `${a} + ${b}`;
-    } else { // a - b = n
-      const span = 10 + Math.floor(Math.random()*6); // 10..15
-      let a = answerNum + Math.floor(Math.random()*span);
-      if (a>30) a=30;
-      let b = a - answerNum;
-      return `${a} - ${b}`;
-    }
-  }
-
-  // Fit text into a square cell with padding; returns chosen font size
-  // function fitTextInCell(ctx, text, cellSize, pad, maxPx, minPx=8) {
-  //   let size = Math.min(maxPx, Math.floor(cellSize - 2*pad));
-  //   size = Math.max(size, minPx);
-  //   ctx.font = `bold ${size}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-  //   let w = ctx.measureText(text).width;
-  //   // If too wide, shrink until it fits (cap iterations)
-  //   let safety = 20;
-  //   while (w > (cellSize - 2*pad) && size > minPx && safety-- > 0) {
-  //     size -= 1;
-  //     ctx.font = `bold ${size}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-  //     w = ctx.measureText(text).width;
-  //   }
-  //   return size;
-  // }
-  function fitTextInCell(ctx, text, cellSize, pad, maxPx, minPx = 6) {
-    // start slightly smaller to give guaranteed padding
-    let size = Math.min(maxPx, Math.floor((cellSize - 4 * pad) * 0.8));
-    ctx.font = `bold ${size}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-    let w = ctx.measureText(text).width;
-    let safety = 40;
-    // shrink until width < cell - 4*pad
-    while (w > (cellSize - 4 * pad) && size > minPx && safety-- > 0) {
-      size -= 0.5;
-      ctx.font = `bold ${size}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-      w = ctx.measureText(text).width;
-    }
-    return size;
-  }
-
-  // Render page 1: worksheet with problems + simplified horizontal key
-  function renderWorksheetCanvas() {
-    const PAGE_W = 1800;              // keep paper width consistent
-    const MARGIN = 60;
-    const TITLE_H = 64;
-    const ND_H = 40;
-    const ND_GAP = 20;
-    const KEY_SWATCH = 28;            // small swatch square
-    const KEY_CELL_W = 96;            // swatch + "= N"
-    const KEY_ROW_GAP = 12;
-    const GRID_MAX_W = PAGE_W - MARGIN*2;
-
-    // Determine grid cell size based on content below the key
-    // 1) Compute rows of key (horizontal, wrapping)
-    const itemsPerRow = Math.max(1, Math.floor((PAGE_W - MARGIN*2) / KEY_CELL_W));
-    const keyRows = Math.ceil(palette.length / itemsPerRow);
-    const KEY_BLOCK_H = keyRows * (KEY_SWATCH + KEY_ROW_GAP) + 6;
-
-    // 2) Choose cell size so grid fits the width
-    let cell = Math.max(16, Math.floor(GRID_MAX_W / gridW));
-    let gridDrawW = cell * gridW;
-    let gridDrawH = cell * gridH;
-
-    // 3) Compute total height and ensure cell fits vertically too
-    let PAGE_H = MARGIN + TITLE_H + ND_H + ND_GAP + KEY_BLOCK_H + 20 + gridDrawH + MARGIN;
-
-    // If height is excessive (very tall grid), reduce cell to fit within reasonable page height (~Letter/A4 portrait height ratio)
-    // We'll target a ~1.3 aspect page if grid is huge.
-    const TARGET_H = Math.max(PAGE_H, 1200); // at least this tall; will get exact size below
-    // Recompute cell so it fits within a cap if needed
-    const usableH = TARGET_H - (MARGIN + TITLE_H + ND_H + ND_GAP + KEY_BLOCK_H + 20 + MARGIN);
-    const maxCellH = Math.floor(usableH / gridH);
-    cell = Math.min(cell, Math.max(12, maxCellH));
-    gridDrawW = cell * gridW;
-    gridDrawH = cell * gridH;
-    PAGE_H = MARGIN + TITLE_H + ND_H + ND_GAP + KEY_BLOCK_H + 20 + gridDrawH + MARGIN;
-
-    const c = document.createElement('canvas');
-    c.width = PAGE_W; c.height = PAGE_H;
-    const ctx = c.getContext('2d');
-
-    // Background
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,PAGE_W,PAGE_H);
-    ctx.fillStyle = '#000000'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-
-    // Title
-    ctx.font = 'bold 36px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    ctx.fillText('Pixel Math Worksheet', MARGIN, MARGIN);
-
-    // Name / Date lines
-    const ndY = MARGIN + TITLE_H;
-    ctx.font = '18px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    ctx.fillText('Name: ____________________________', MARGIN, ndY);
-    ctx.fillText('Date: ____________________________', MARGIN + 500, ndY);
-
-    // Horizontal Color–Number Key (uses user-defined answer values)
-    let keyY = ndY + ND_H + ND_GAP;
-    ctx.font = 'bold 18px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    ctx.fillText('Color–Number Key:', MARGIN, keyY);
-    keyY += 8;
-
-    ctx.font = '16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-    let x = MARGIN, y = keyY + 36;
-
-    // Grab user-assigned answer values
-    const answersCard = document.getElementById('answersCard');
-    let userAnswers = [];
-    if (answersCard && answersCard.style.display !== 'none') {
-      userAnswers = Array.from(answersCard.querySelectorAll('input[type="number"]'))
-        .map(inp => parseFloat(inp.value));
-    }
-
-    palette.forEach((col, i) => {
-      // wrap if needed
-      if (x + KEY_CELL_W > PAGE_W - MARGIN) { x = MARGIN; y += KEY_SWATCH + KEY_ROW_GAP; }
-      // Swatch
-      ctx.fillStyle = col.hex;
-      ctx.fillRect(x, y - KEY_SWATCH / 2, KEY_SWATCH, KEY_SWATCH);
-      ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
-      ctx.strokeRect(x, y - KEY_SWATCH / 2, KEY_SWATCH, KEY_SWATCH);
-      // “= answer value”
-      const ansVal = userAnswers[i] ?? (i + 1);
-      ctx.fillStyle = '#000'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-      ctx.fillText(`= ${ansVal}`, x + KEY_SWATCH + 8, y);
-      x += KEY_CELL_W;
-    });
-
-    // Grid of problems
-    const gridY = y + KEY_SWATCH/2 + 20;
-    // const pad = Math.max(4, Math.floor(cell*0.12));
-    const pad = Math.max(6, Math.floor(cell*5));
-    problems = new Array(gridW*gridH);
-
-    for (let r=0;r<gridH;r++){
-      for (let ccol=0; ccol<gridW; ccol++){
-        const idx = r*gridW + ccol;
-        const palIndex = indices[idx]; // 0..K-1
-        // const ans = palIndex + 1;      // 1..K
-        
-        // Allow user-defined answer values
-        const answersCard = document.getElementById('answersCard');
-        let ans = palIndex + 1;
-        if (answersCard.style.display !== 'none') {
-          const inputs = answersCard.querySelectorAll('input[type="number"]');
-          if (inputs[palIndex]) {
-            const val = parseFloat(inputs[palIndex].value);
-            if (!isNaN(val)) ans = val;
+        for (let iy = startY; iy < endY; iy++) {
+          for (let ix = startX; ix < endX; ix++) {
+            const idx = (iy * img.width + ix) * 4;
+            rSum += data[idx];
+            gSum += data[idx + 1];
+            bSum += data[idx + 2];
+            count++;
           }
         }
-        
-        const prob = makeProblem(ans);
-        problems[idx] = prob;
 
-        const x0 = MARGIN + ccol*cell;
-        const y0 = gridY + r*cell;
-
-        // Cell rect
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
-        ctx.strokeRect(x0, y0, cell, cell);
-
-        // Fit & draw text
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        // const fontPx = fitTextInCell(ctx, prob, cell, pad, Math.floor(cell*0.6), 8);
-        console.log(document.getElementById('fontScale'))
-        const fontPx = document.getElementById('fontScale').value
-        
-        ctx.font = `${fontPx}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
-        ctx.fillStyle = '#000';
-        ctx.fillText(prob, x0 + cell/2, y0 + cell/2);
+        cellColors[y * gridW + x] = {
+          r: Math.round(rSum / count),
+          g: Math.round(gSum / count),
+          b: Math.round(bSum / count)
+        };
       }
     }
-
-    // Store size for the answer page
-    lastPageW = PAGE_W;
-    lastPageH = PAGE_H;
-
-    return c;
   }
 
-  // Render page 2: full-page color answer grid (fills page within margins)
-  function renderAnswerCanvas() {
-    const PAGE_W = lastPageW || 1800;
-    const PAGE_H = lastPageH || 1300;
-    const MARGIN = 60;
+  // ---- K-means quantization
+  function kmeansQuantize(K, maxIter = 15) {
+    if (!cellColors.length) return;
+    const pixels = cellColors.map(p => [p.r, p.g, p.b]);
 
-    const usableW = PAGE_W - 2*MARGIN;
-    const usableH = PAGE_H - 2*MARGIN;
+    const centroids = [];
+    const usedIndices = new Set();
+    while (centroids.length < K) {
+      const idx = Math.floor(Math.random() * pixels.length);
+      if (!usedIndices.has(idx)) { centroids.push([...pixels[idx]]); usedIndices.add(idx); }
+    }
 
-    // Choose the largest cell that fits both width & height
-    const cellW = Math.floor(usableW / gridW);
-    const cellH = Math.floor(usableH / gridH);
-    const cell = Math.max(6, Math.min(cellW, cellH));
+    let assignments = new Array(pixels.length).fill(0);
 
-    const gridDrawW = cell * gridW;
-    const gridDrawH = cell * gridH;
+    for (let iter=0; iter<maxIter; iter++) {
+      for (let i=0;i<pixels.length;i++) {
+        let minD=Infinity, best=0;
+        for (let k=0;k<K;k++) {
+          const dr=pixels[i][0]-centroids[k][0];
+          const dg=pixels[i][1]-centroids[k][1];
+          const db=pixels[i][2]-centroids[k][2];
+          const d=dr*dr+dg*dg+db*db;
+          if (d<minD){minD=d;best=k;}
+        }
+        assignments[i]=best;
+      }
 
-    // Center the grid
-    const xStart = Math.floor((PAGE_W - gridDrawW) / 2);
-    const yStart = Math.floor((PAGE_H - gridDrawH) / 2);
-
-    const c = document.createElement('canvas');
-    c.width = PAGE_W; c.height = PAGE_H;
-    const ctx = c.getContext('2d');
-
-    // Background
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,PAGE_W,PAGE_H);
-
-    // Draw colored pixels
-    for (let r=0;r<gridH;r++){
-      for (let col=0; col<gridW; col++){
-        const idx = r*gridW + col;
-        const pIndex = indices[idx];
-        ctx.fillStyle = palette[pIndex].hex;
-        ctx.fillRect(xStart + col*cell, yStart + r*cell, cell, cell);
+      const sums = Array(K).fill(0).map(()=>[0,0,0,0]);
+      for (let i=0;i<pixels.length;i++){
+        const k=assignments[i];
+        sums[k][0]+=pixels[i][0];
+        sums[k][1]+=pixels[i][1];
+        sums[k][2]+=pixels[i][2];
+        sums[k][3]+=1;
+      }
+      for (let k=0;k<K;k++){
+        if (sums[k][3]>0){
+          centroids[k][0]=sums[k][0]/sums[k][3];
+          centroids[k][1]=sums[k][1]/sums[k][3];
+          centroids[k][2]=sums[k][2]/sums[k][3];
+        }
       }
     }
 
-    // Optional crisp grid lines (very light)
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-    ctx.lineWidth = 1;
-    for (let x=0; x<=gridW; x++){
-      ctx.beginPath();
-      ctx.moveTo(xStart + x*cell + 0.5, yStart);
-      ctx.lineTo(xStart + x*cell + 0.5, yStart + gridDrawH);
-      ctx.stroke();
-    }
-    for (let y=0; y<=gridH; y++){
-      ctx.beginPath();
-      ctx.moveTo(xStart, yStart + y*cell + 0.5);
-      ctx.lineTo(xStart + gridDrawW, yStart + y*cell + 0.5);
-      ctx.stroke();
-    }
+    palette = centroids.map(c=>{
+      const r=Math.round(c[0]), g=Math.round(c[1]), b=Math.round(c[2]);
+      return {r,g,b,hex:rgbToHex(r,g,b), lum:0.2126*r+0.7152*g+0.0722*b};
+    }).sort((a,b)=>a.lum-b.lum);
 
-    return c;
+    indices = pixels.map(pix=>{
+      let best=0, minD=Infinity;
+      for (let k=0;k<palette.length;k++){
+        const dr=pix[0]-palette[k].r;
+        const dg=pix[1]-palette[k].g;
+        const db=pix[2]-palette[k].b;
+        const d=dr*dr+dg*dg+db*db;
+        if(d<minD){minD=d;best=k;}
+      }
+      return best;
+    });
   }
 
   // ---- File input / drop
@@ -596,95 +317,15 @@
 
   // ---- Buttons
   document.getElementById('btnPixelate').addEventListener('click', ()=>{
-    if (!imgLoaded) { alert('Please upload an image first.'); return; }
-    const W = parseInt(colsEl.value,10) || 24;
-    const H = parseInt(rowsEl.value,10) || 24;
-    const K = parseInt(kEl.value,10)    || 6;
+    if(!imgLoaded){alert('Please upload an image first.');return;}
+    const W=parseInt(colsEl.value,10)||24;
+    const H=parseInt(rowsEl.value,10)||24;
+    const K=parseInt(kEl.value,10)||6;
     sampleToGrid(W,H);
-    // kmeansQuantize(K);
-    clusterQuantize(K);
-    drawPixelatedPreview();
-    
-    // Build Answer-Value UI for each palette color
-    const answersCard = document.getElementById('answersCard');
-    const answersContainer = document.getElementById('answersContainer');
-    answersContainer.innerHTML = '';
-    palette.forEach((c, i) => {
-      const row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.marginBottom = '4px';
-
-      const swatch = document.createElement('div');
-      swatch.style.width = '20px';
-      swatch.style.height = '20px';
-      swatch.style.background = c.hex;
-      swatch.style.border = '1px solid #333';
-      swatch.style.marginRight = '8px';
-      row.appendChild(swatch);
-
-      const label = document.createElement('span');
-      label.textContent = `Color ${i + 1} =`;
-      label.style.marginRight = '6px';
-      row.appendChild(label);
-
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.min = '-999'; input.max = '999';
-      input.step = '1';
-      input.value = i + 1;  // default mapping
-      input.dataset.index = i;
-      input.style.width = '70px';
-      input.style.padding = '2px 4px';
-      row.appendChild(input);
-
-      answersContainer.appendChild(row);
-    });
-
-    // Reveal the card now that the palette exists
-    answersCard.style.display = 'block';
-
-    
-    worksheetPreviewImg.removeAttribute('src');
-    answerPreviewImg.removeAttribute('src');
+    kmeansQuantize(K);
+    // drawPixelatedPreview(); -- add your drawPixelatedPreview function here
   });
 
-  document.getElementById('btnGenerate').addEventListener('click', ()=>{
-    if (!imgLoaded || !indices.length) { alert('Pixelate the image first.'); return; }
-
-    // Page 1: worksheet
-    const wsCanvas = renderWorksheetCanvas();
-    const wsURL = wsCanvas.toDataURL('image/png');
-    worksheetPreviewImg.src = wsURL;
-    worksheetPrintImg.src = wsURL;
-
-    // Conditionally include answer key
-    if (includeAnswerKeyEl.checked) {
-      const ansCanvas = renderAnswerCanvas();
-      const ansURL = ansCanvas.toDataURL('image/png');
-      answerPreviewImg.src = ansURL;
-      answerPrintImg.src = ansURL;
-      answerPrintImg.style.display = "block";
-    } else {
-      answerPreviewImg.removeAttribute('src');
-      answerPrintImg.removeAttribute('src');
-      answerPrintImg.style.display = "none";
-    }
-
-    worksheetPreviewImg.scrollIntoView({ behavior:'smooth', block:'center' });
-  });
-
-  document.getElementById('btnSave').addEventListener('click', ()=>{
-    if (!worksheetPrintImg.src) {
-      const proceed = confirm('You have not generated worksheet/answer images yet.\nOpen the print dialog anyway?');
-      if (!proceed) return;
-    }
-    window.print();
-  });
-
-  // Initial canvases
-  origCanvas.width = 360; origCanvas.height = 240;
-  pixCanvas.width  = 360; pixCanvas.height = 240;
 })();
 </script>
 </body>
